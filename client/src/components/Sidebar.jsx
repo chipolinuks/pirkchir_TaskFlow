@@ -17,7 +17,7 @@ export default function Sidebar() {
  <div className="sidebarNote">
  <strong>Чурикова Полина</strong>
  <span>ИКБО-21-25</span>
- </div>
+</div>
  </aside>
  );
 }
