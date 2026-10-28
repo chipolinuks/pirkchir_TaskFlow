@@ -11,6 +11,7 @@ GET {{baseUrl}}/api/tasks/{{taskId}}
 ### Создать задачу
 POST {{baseUrl}}/api/tasks
 Content-Type: application/json
+
 {
  "title": "Подготовить третью практику",
  "project": "TaskFlow",
@@ -21,6 +22,7 @@ Content-Type: application/json
 ### Ошибка 400: пустой title
 POST {{baseUrl}}/api/tasks
 Content-Type: application/json
+
 {
  "title": "",
  "project": "TaskFlow",
@@ -30,6 +32,7 @@ Content-Type: application/json
 ### Ошибка 400: неправильный status
 POST {{baseUrl}}/api/tasks
 Content-Type: application/json
+
 {
  "title": "Проверить валидацию",
  "project": "TaskFlow",
@@ -39,12 +42,14 @@ Content-Type: application/json
 ### Изменить статус задачи
 PATCH {{baseUrl}}/api/tasks/{{taskId}}
 Content-Type: application/json
+
 {
  "status": "Готово"
 }
 ### Изменить название и приоритет
 PATCH {{baseUrl}}/api/tasks/{{taskId}}
 Content-Type: application/json
+
 {
  "title": "Подготовить макет интерфейса",
  "priority": "Средний"
@@ -55,3 +60,37 @@ DELETE {{baseUrl}}/api/tasks/{{taskId}}
 GET {{baseUrl}}/api/tasks/00000000-0000-4000-8000-000000000000
 ### Ошибка 404: неизвестный endpoint
 GET {{baseUrl}}/api/unknown
+
+### Фильтр по проекту
+GET {{baseUrl}}/api/tasks?project=Учебный%20проект
+
+### Создать задачу с описанием
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Дожить до конца сема",
+  "project": "2 курс",
+  "description": "Денег нет, но вы держитесь",
+  "status": "Нужно сделать",
+  "priority": "Высокий",
+  "dueDate": "2026-10-01"
+}
+
+### Ошибка 400: неверный формат даты
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Проверить валидацию даты",
+  "project": "TaskFlow",
+  "dueDate": "01.10.2026"
+}
+
+### Изменить описание задачи
+PATCH {{baseUrl}}/api/tasks/{{taskId}}
+Content-Type: application/json
+
+{
+  "description": "не чето не хочу пока"
+}

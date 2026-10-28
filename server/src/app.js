@@ -3,33 +3,37 @@ import { randomUUID } from 'node:crypto';
 
 const app = express();
 const PORT = 3000;
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 app.use(express.json());
 
 let tasks = [
- {
- id: '11111111-1111-4111-8111-111111111111',
- title: 'Подготовить макет главной страницы',
- project: 'Учебный проект',
- status: 'В работе',
- priority: 'Высокий',
- dueDate: '2026-09-20',
- },
- {
- id: '22222222-2222-4222-8222-222222222222',
- title: 'Разобраться с REST API',
- project: 'Обучение',
- status: 'Нужно сделать',
- priority: 'Средний',
- dueDate: '2026-09-25',
- },
- {
- id: '33333333-3333-4333-8333-333333333333',
- title: 'Проверить запросы к серверу',
- project: 'TaskFlow',
- status: 'Готово',
- priority: 'Низкий',
- dueDate: '2026-09-18',
- },
+  {
+    id: '11111111-1111-4111-8111-111111111111',
+    title: 'Подготовить макет главной страницы',
+    description: 'Создать wireframes и мокапы для главной страницы',
+    project: 'Учебный проект',
+    status: 'В работе',
+    priority: 'Высокий',
+    dueDate: '2026-09-20',
+  },
+  {
+    id: '22222222-2222-4222-8222-222222222222',
+    title: 'Разобраться с REST API',
+    description: 'Изучить методы GET, POST, PATCH, DELETE',
+    project: 'Обучение',
+    status: 'Нужно сделать',
+    priority: 'Средний',
+    dueDate: '2026-09-25',
+  },
+  {
+    id: '33333333-3333-4333-8333-333333333333',
+    title: 'Проверить запросы к серверу',
+    description: 'Протестировать все endpoint через REST Client',
+    project: 'TaskFlow',
+    status: 'Готово',
+    priority: 'Низкий',
+    dueDate: '2026-09-18',
+  },
 ];
 
 const allowedStatuses = [
@@ -56,6 +60,9 @@ function validateTask(data, partial = false) {
  errors.push('Поле project обязательно');
  }
  }
+ if (data.description !== undefined && typeof data.description !== 'string') {
+ errors.push('Поле description должно быть строкой');
+ }
  if (data.status !== undefined && !allowedStatuses.includes(data.status)) {
  errors.push('Недопустимый status');
  }
@@ -67,6 +74,13 @@ function validateTask(data, partial = false) {
  }
  if (partial && Object.keys(data).length === 0) {
  errors.push('Передайте хотя бы одно поле для изменения');
+ }
+ if (data.dueDate !== undefined) {
+ if (typeof data.dueDate !== 'string') {
+    errors.push('Поле dueDate должно быть строкой');
+ } else if (data.dueDate && !DATE_REGEX.test(data.dueDate)) {
+    errors.push('Поле dueDate должно быть в формате YYYY-MM-DD');
+ }
  }
  return errors;
 }
@@ -83,6 +97,9 @@ app.get('/api/tasks', (req, res) => {
  }
  if (priority) {
  result = result.filter((task) => task.priority === priority);
+ }
+ if (project) {
+ result = result.filter((task) => task.project === project);
  }
  res.json(result);
 });
@@ -106,6 +123,7 @@ app.post('/api/tasks', (req, res) => {
  id: randomUUID(),
  title: req.body.title.trim(),
  project: req.body.project.trim(),
+ description: req.body.description?.trim() || '',
  status: req.body.status ?? 'Нужно сделать',
  priority: req.body.priority ?? 'Средний',
  dueDate: req.body.dueDate ?? '',
@@ -136,6 +154,9 @@ app.patch('/api/tasks/:id', (req, res) => {
  project: req.body.project !== undefined
  ? req.body.project.trim()
  : currentTask.project,
+ description: req.body.description !== undefined 
+ ? req.body.description.trim()
+ : currentTask.description,
  status: req.body.status ?? currentTask.status,
  priority: req.body.priority ?? currentTask.priority,
  dueDate: req.body.dueDate ?? currentTask.dueDate,
